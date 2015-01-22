@@ -27,23 +27,33 @@ form {
 
 #pizzaSize {
   font-weight: 800;
+  transition: all 1s ease-out;
 }
 
 .mover {
+  transform: translateZ(0);
   position: fixed;
   width: 256px;
   z-index: -1;
+  transition: all 1s ease-out;
+}
+
+.mover.left {
+  left: 356px;
 }
 
 .randomPizzaContainer {
+  transform: translateZ(1);
   float: left;
   display: flex;
+  transition: all 1s ease-in;
 }
 
 .randomPizzaContainer:after {
   content: "";
   display: table;
   clear:both;
+  transition: all 1s ease-in;
 }
 
  .container {

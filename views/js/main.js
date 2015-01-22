@@ -427,6 +427,7 @@ var resizePizzas = function(size) {
     var windowwidth = document.querySelector("#randomPizzas").offsetWidth;
     var oldsize = oldwidth / windowwidth;
 
+
     // TODO: change to 3 sizes? no more xl?
     // Changes the slider value to a percent width
     function sizeSwitcher (size) {
@@ -441,30 +442,36 @@ var resizePizzas = function(size) {
           console.log("bug in sizeSwitcher");
       }
     }
+    
 
     var newsize = sizeSwitcher(size);
     var dx = (newsize - oldsize) * windowwidth;
 
     return dx;
-  }
+}
 
   // Iterates through pizza elements on the page and changes their widths
   function changePizzaSizes(size) {
-    for (var i = 0; i < document.querySelectorAll(".randomPizzaContainer").length; i++) {
-      var dx = determineDx(document.querySelectorAll(".randomPizzaContainer")[i], size);
-      var newwidth = (document.querySelectorAll(".randomPizzaContainer")[i].offsetWidth + dx) + 'px';
-      document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+    
+    var randomPizza = document.querySelectorAll(".randomPizzaContainer")
+    var dx = determineDx(document.querySelectorAll(".randomPizzaContainer")[0], size);
+    var newwidth = (document.querySelectorAll(".randomPizzaContainer")[0].offsetWidth + dx) + 'px';
+    
+    for (var i = 0; i < randomPizza.length; i++) {
+     // document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+      randomPizza[i].style.width = newwidth;
     }
   }
 
-  changePizzaSizes(size);
+ changePizzaSizes(size);
 
   // User Timing API is awesome
   window.performance.mark("mark_end_resize");
   window.performance.measure("measure_pizza_resize", "mark_start_resize", "mark_end_resize");
   var timeToResize = window.performance.getEntriesByName("measure_pizza_resize");
   console.log("Time to resize pizzas: " + timeToResize[0].duration + "ms");
-}
+  window.performance.clearMeasures('measure_pizza_resize'); 
+};
 
 window.performance.mark("mark_start_generating"); // collect timing data
 
@@ -498,14 +505,40 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 // https://www.igvita.com/slides/2012/devtools-tips-and-tricks/jank-demo.html
 
 // Moves the sliding background pizzas based on scroll position
-function updatePositions() {
+
+// Returns a function, that, as long as it continues to be invoked, will not
+// be triggered. The function will be called after it stops being called for
+// N milliseconds. If `immediate` is passed, trigger the function on the
+// leading edge, instead of the trailing.
+
+ var movers          = document.querySelectorAll('.mover'),
+     lastScrollY     = 0,
+     ticking         = false;
+
+function onScroll() {
+        lastScrollY = window.scrollY;
+        requestTick();
+    }
+
+  function requestTick() {
+        if(!ticking) {
+            requestAnimFrame(updatePositions);
+            ticking = true;
+        }
+    }
+
+var updatePositions = function() {
   frame++;
   window.performance.mark("mark_start_frame");
 
-  var items = document.querySelectorAll('.mover');
-  for (var i = 0; i < items.length; i++) {
-    var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
-    items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
+  if (movers.length === 0) {
+    movers = document.getElementsByClassName('mover');
+  }
+  
+  
+  for (var i = 0; i < movers.length; i++) {
+    var phase = Math.sin((lastScrollY / 1250) + (i % 5));
+    movers[i].style.left = movers[i].basicLeft + 100 * phase + 'px';
   }
 
   // User Timing API to the rescue again. Seriously, it's worth learning.
@@ -516,10 +549,23 @@ function updatePositions() {
     var timesToUpdatePosition = window.performance.getEntriesByName("measure_frame_duration");
     logAverageFrame(timesToUpdatePosition);
   }
-}
+  ticking = false;
+};
 
 // runs updatePositions on scroll
-window.addEventListener('scroll', updatePositions);
+
+window.addEventListener('scroll', onScroll, false);
+
+ window.requestAnimFrame = (function(){
+      return  window.requestAnimationFrame       ||
+              window.webkitRequestAnimationFrame ||
+              window.mozRequestAnimationFrame    ||
+              window.oRequestAnimationFrame      ||
+              window.msRequestAnimationFrame     ||
+              function( callback ){
+                window.setTimeout(callback, 1000 / 60);
+              };
+    })();
 
 // Generates the sliding pizzas when the page loads.
 document.addEventListener('DOMContentLoaded', function() {
