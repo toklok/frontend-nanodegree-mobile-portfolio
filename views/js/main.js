@@ -451,6 +451,9 @@ var resizePizzas = function(size) {
 }
 
   // Iterates through pizza elements on the page and changes their widths
+  
+  //Changed some of the changePizzaSizes function around. 
+  
   function changePizzaSizes(size) {
     
     var randomPizza = document.querySelectorAll(".randomPizzaContainer")
@@ -510,6 +513,10 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 // be triggered. The function will be called after it stops being called for
 // N milliseconds. If `immediate` is passed, trigger the function on the
 // leading edge, instead of the trailing.
+
+
+//requestAnimationFrame is used for the scrolling. www.html5rocks.com/en/tutorials/speed/scrolling/ akso used transition and translationZ(0) in my CSS to not have such a janky feel, and it improved performance.  
+
 
  var movers          = document.querySelectorAll('.mover'),
      lastScrollY     = 0,
