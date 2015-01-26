@@ -1,0 +1,13 @@
+{
+  "name": "udacity-build",
+  "devDependencies": {
+    "jshint": "latest",
+    "clean-css": "latest",
+    "html-validator": "latest"
+  },
+  "scripts": {
+    "lint": "jshint **.js",
+    "clean": "cleancss -o style-min.css style.css"
+    
+  }
+}
