@@ -8,6 +8,5 @@
   "scripts": {
     "lint": "jshint **.js",
     "clean": "cleancss -o style-min.css style.css"
-    
   }
 }
